@@ -1,23 +1,39 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 
-const drawSierpinskiIterative = (ctx, x, y, size) => {
+const drawSierpinskiIterative = (ctx, x, y, size, zoom, offset, canvasWidth, canvasHeight) => {
   const height = (Math.sqrt(3) / 2) * size;
   const transform = ctx.getTransform();
   const scaleX = transform.a;
 
-  const minScreenSize = 2; // Minimum visible triangle size on screen
+  const minScreenSize = 2;
   const queue = [{ x, y, size }];
+
+  // World-space visible bounds
+  const halfW = canvasWidth / 2;
+  const halfH = canvasHeight / 2;
+  const left = (-offset.x - halfW) / zoom;
+  const right = (-offset.x + halfW) / zoom;
+  const top = (-offset.y - halfH) / zoom;
+  const bottom = (-offset.y + halfH) / zoom;
 
   while (queue.length > 0) {
     const tri = queue.pop();
     const screenSize = tri.size * scaleX;
 
-    if (screenSize < minScreenSize) continue;
-
     const h = (Math.sqrt(3) / 4) * tri.size;
 
+    // Triangle bounding box (world space)
+    const triLeft = tri.x - tri.size / 2;
+    const triRight = tri.x + tri.size / 2;
+    const triTop = tri.y;
+    const triBottom = tri.y + (Math.sqrt(3) / 2) * tri.size;
+
+    // Cull if outside screen bounds
+    if (triRight < left || triLeft > right || triBottom < top || triTop > bottom) continue;
+
+    if (screenSize < minScreenSize) continue;
+
     if (screenSize < 10) {
-      // Draw small triangle
       ctx.beginPath();
       ctx.moveTo(tri.x, tri.y);
       ctx.lineTo(tri.x + tri.size / 2, tri.y + (Math.sqrt(3) / 2) * tri.size);
@@ -55,7 +71,7 @@ const CanvasTriangle = () => {
       ctx.fillStyle = "black";
 
       const baseSize = 600;
-      drawSierpinskiIterative(ctx, 0, -baseSize / Math.sqrt(3), baseSize);
+      drawSierpinskiIterative(ctx, 0, -baseSize / Math.sqrt(3), baseSize, zoom, offset, width, height);
     });
   }, [offset, zoom]);
 
