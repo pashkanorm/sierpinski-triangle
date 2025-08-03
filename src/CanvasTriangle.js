@@ -64,9 +64,10 @@ const CanvasTriangle = () => {
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       const { width, height } = canvas;
+      // Inside your render function:
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, width, height);
-      ctx.translate(width / 2 + offset.x, height / 4 + offset.y);
+      ctx.translate(width / 2 + offset.x, height / 2 + offset.y); // <-- Changed from height / 4 to height / 2
       ctx.scale(zoom, zoom);
       ctx.fillStyle = "black";
 
@@ -93,14 +94,14 @@ const CanvasTriangle = () => {
       const mouseY = e.clientY - rect.top;
 
       const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-      const newZoom = Math.max(0.01, Math.min(zoom * zoomFactor, 100000));
+      const newZoom = Math.max(0.01, Math.min(zoom * zoomFactor, 220000));
 
-      const dx = mouseX - canvas.width / 2 - offset.x;
-      const dy = mouseY - canvas.height / 4 - offset.y;
+      const dx = mouseX - (canvas.width / 2 + offset.x);
+      const dy = mouseY - (canvas.height / 2 + offset.y);
 
       setOffset((prev) => ({
-        x: prev.x - dx * (newZoom / zoom - 1),
-        y: prev.y - dy * (newZoom / zoom - 1),
+        x: prev.x + dx * (1 - newZoom / zoom),
+        y: prev.y + dy * (1 - newZoom / zoom),
       }));
 
       setZoom(newZoom);
