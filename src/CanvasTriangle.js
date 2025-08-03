@@ -64,10 +64,9 @@ const CanvasTriangle = () => {
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       const { width, height } = canvas;
-      // Inside your render function:
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, width, height);
-      ctx.translate(width / 2 + offset.x, height / 2 + offset.y); // <-- Changed from height / 4 to height / 2
+      ctx.translate(width / 2 + offset.x, height / 2 + offset.y);
       ctx.scale(zoom, zoom);
       ctx.fillStyle = "black";
 
@@ -165,8 +164,9 @@ const CanvasTriangle = () => {
       <h2>Zoom: {zoom.toFixed(2)}</h2>
       <canvas
         ref={canvasRef}
+        // border size
         width={800}
-        height={600}
+        height={800}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
